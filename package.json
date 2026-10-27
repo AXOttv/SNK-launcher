@@ -1,7 +1,7 @@
 {
     "name": "SNK-Launcher",
     "preductname": "SNK : Last Dawn - Launcher",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "SNK launcher",
     "main": "src/app.js",
     "author": "AXO, Xevos, Galax, Riptiaz/Boulldogo/Vexato/Luuxis",
