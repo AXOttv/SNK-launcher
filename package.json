@@ -1,12 +1,12 @@
 {
-    "name": "test",
-    "preductname": "Conflictura Launcher",
+    "name": "SNK-Launcher",
+    "preductname": "SNK : Last Dawn - Launcher",
     "version": "1.0.0",
-    "description": "Conflictura modded server launcher",
+    "description": "SNK launcher",
     "main": "src/app.js",
-    "author": "Riptiaz/Boulldogo/Vexato/Luuxis",
-    "env": "azuriom",
-    "settings": "https://conflictura.eu",
+    "author": "AXO, Xevos, Galax, Riptiaz/Boulldogo/Vexato/Luuxis",
+    "env": "panel",
+    "settings": "https://panel.snk-lastdawn.x10.mx",
     "scripts": {
         "start": "cross-env-shell NODE_ENV=dev electron .",
         "build": "node build.js --obf=true --build=platform",
@@ -38,6 +38,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Riptiaz/CentralCorp-Launcher.git"
+        "url": "git+https://github.com/AXOttv/SNK-launcher"
     }
 }

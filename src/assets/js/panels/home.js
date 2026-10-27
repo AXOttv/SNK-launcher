@@ -344,40 +344,98 @@ class Home {
 
   async initVideo() {
     const videoContainer = document.querySelector(".ytb");
+    if (!videoContainer) return;
+
     if (!this.config.video_activate) {
       videoContainer.style.display = "none";
       return;
     }
 
-    const youtubeVideoId = this.config.video_url;
-    const videoType = this.config.video_type;
-    let youtubeEmbedUrl;
+    // The config may contain either a YouTube video ID or a full URL.
+    const rawVideo = String(this.config.video_url || "").trim();
+    const extractYouTubeId = (value) => {
+      if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
+      try {
+        const url = new URL(value.includes("://") ? value : `https://${value}`);
+        const host = url.hostname.replace(/^www\./, "").toLowerCase();
+        let id = "";
+        if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
+        else if (host.endsWith("youtube.com") || host === "youtube-nocookie.com") {
+          if (url.pathname === "/watch") id = url.searchParams.get("v") || "";
+          else if (["/embed/", "/shorts/", "/live/", "/v/"].some((prefix) => url.pathname.startsWith(prefix))) {
+            id = url.pathname.split("/").filter(Boolean)[1] || "";
+          }
+        }
+        return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
+      } catch (_) {
+        return "";
+      }
+    };
 
-    if (videoType === "short") {
-      youtubeEmbedUrl = `https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&playsinline=1`;
-    } else if (videoType === "video") {
-      youtubeEmbedUrl = `https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1`;
-    } else {
-      console.error("Invalid video type specified in the configuration.");
+    const videoId = extractYouTubeId(rawVideo);
+    const videoThumbnail = videoContainer.querySelector(".youtube-thumbnail");
+    if (!videoThumbnail) return;
+    const btn = videoContainer.querySelector(".ytb-btn");
+
+    if (!videoId) {
+      console.error("SNK: video_url doit être un identifiant YouTube ou une URL de vidéo valide.", rawVideo);
+      videoThumbnail.innerHTML = '<div class="video-unavailable">Vidéo YouTube indisponible : vérifie video_url dans la configuration.</div>';
+      if (btn) btn.style.display = "none";
       return;
     }
 
-    const youtubeThumbnailUrl = `https://img.youtube.com/vi/${youtubeVideoId}/hqdefault.jpg`;
-    const videoThumbnail = videoContainer.querySelector(".youtube-thumbnail");
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&playsinline=1&rel=0&enablejsapi=1`;
+    const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
     const thumbnailImg = videoThumbnail.querySelector(".thumbnail-img");
     const playButton = videoThumbnail.querySelector(".ytb-play-btn");
-    const btn = videoContainer.querySelector(".ytb-btn");
 
-    btn.addEventListener("click", () =>
-      shell.openExternal(`https://youtube.com/watch?v=${youtubeVideoId}`),
-    );
-
-    if (thumbnailImg && playButton) {
-      thumbnailImg.src = youtubeThumbnailUrl;
-      videoThumbnail.addEventListener("click", () => {
-        videoThumbnail.innerHTML = `<iframe width="500" height="290" src="${youtubeEmbedUrl}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>`;
-      });
+    if (btn) {
+      btn.style.display = "";
+      btn.onclick = () => shell.openExternal(watchUrl);
     }
+
+    if (thumbnailImg) {
+      const thumbnails = [
+        `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`,
+        `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+        `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`,
+      ];
+      let thumbnailIndex = 0;
+      thumbnailImg.onerror = () => {
+        thumbnailIndex += 1;
+        if (thumbnailIndex < thumbnails.length) thumbnailImg.src = thumbnails[thumbnailIndex];
+        else {
+          thumbnailImg.style.display = "none";
+          videoThumbnail.classList.add("thumbnail-unavailable");
+        }
+      };
+      thumbnailImg.onload = () => { thumbnailImg.style.display = "block"; };
+      thumbnailImg.src = thumbnails[0];
+    }
+
+    const startPlayback = (event) => {
+      if (event) event.preventDefault();
+      // Replace only the thumbnail area, preserving the surrounding panel.
+      const iframe = document.createElement("iframe");
+      iframe.title = "Lecteur vidéo YouTube";
+      iframe.src = embedUrl;
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("allow", "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen");
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      iframe.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;";
+      videoThumbnail.innerHTML = "";
+      videoThumbnail.style.aspectRatio = "16 / 9";
+      videoThumbnail.style.minHeight = "180px";
+      videoThumbnail.appendChild(iframe);
+    };
+
+    if (playButton) playButton.onclick = startPlayback;
+    videoThumbnail.onclick = startPlayback;
+    videoThumbnail.setAttribute("role", "button");
+    videoThumbnail.setAttribute("aria-label", "Lire la vidéo YouTube");
   }
 
   async initAdvert() {

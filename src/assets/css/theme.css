@@ -1,0 +1,545 @@
+/* ==========================================================
+   SNK : Last Dawn — thème « Cape de la Légion »
+   Laine verte brodée, cuir cousu, boucles en laiton.
+   Style uniquement : aucune logique. Les !important sur :root gardent
+   ces couleurs même si le panel envoie une couleur d'accent.
+   ========================================================== */
+
+:root {
+    --wool: #243a2c;
+    --wool-dark: #15241b;
+    --leather: #2e2116;
+    --leather-dark: #1b130c;
+    --brass: #c6a15b;
+    --brass-light: #e8cf94;
+    --brass-dark: #8a6a2f;
+    --bone: #ece4d0;
+    --blood: #8e1b1b;
+    --blood-light: #c2493f;
+    --leather-tex: url("../images/leather.png");
+    --stitch: rgba(198, 161, 91, 0.5);
+
+    --accent-color: #c6a15b !important;
+    --accent-color-dark: #8a6a2f !important;
+    --accent-color-glow: rgba(198, 161, 91, 0.32) !important;
+    --accent-color-subtle: rgba(198, 161, 91, 0.14) !important;
+    --border-accent: rgba(198, 161, 91, 0.5) !important;
+
+    --bg-primary: rgba(27, 19, 12, 0.97) !important;
+    --bg-secondary: rgba(36, 26, 18, 0.95) !important;
+    --bg-card: rgba(46, 33, 22, 0.94) !important;
+    --bg-hover: rgba(198, 161, 91, 0.12) !important;
+    --text-primary: #ece4d0 !important;
+    --text-secondary: rgba(236, 228, 208, 0.78) !important;
+    --text-muted: rgba(236, 228, 208, 0.5) !important;
+    --border-subtle: rgba(198, 161, 91, 0.2) !important;
+    --radius-sm: 3px !important;
+    --radius-md: 5px !important;
+    --radius-lg: 8px !important;
+}
+
+html body {
+    background:
+        linear-gradient(rgba(10, 18, 13, 0.18), rgba(10, 18, 13, 0.36)),
+        url("../images/background/light.jpg") var(--wool-dark) no-repeat center center;
+    background-size: cover;
+}
+
+::selection {
+    background: var(--blood);
+    color: var(--bone);
+}
+
+/* Cuir : texture + dégradé de lumière commun à tous les panneaux */
+.top-belt,
+.bottom-belt,
+.tabs-settings-btn,
+.news-block,
+.server,
+.ytb,
+.login-card-main,
+.a2f-card,
+.email-verify-card,
+.account,
+.add-account,
+.java-settings,
+.mods-info,
+.skin-dropzone {
+    background:
+        linear-gradient(160deg, rgba(255, 235, 200, 0.07) 0%, rgba(0, 0, 0, 0.22) 100%),
+        var(--leather-tex) var(--leather);
+    background-size: auto, 256px 256px;
+}
+
+/* Surpiqûre : fil laiton pointillé cousu à l'intérieur du bord */
+.news-block,
+.server,
+.ytb,
+.login-card-main,
+.a2f-card,
+.email-verify-card,
+.account,
+.java-settings,
+.mods-info {
+    border: 1px solid #0e0905;
+    outline: 1px dashed var(--stitch);
+    outline-offset: -6px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 235, 200, 0.1);
+}
+
+/* ---------- typographie ---------- */
+.title,
+.server-text .name,
+.title-change,
+.title-settings,
+.login-title,
+.preload-title,
+.splash-message {
+    font-family: 'Grenze', 'Georgia', serif !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4px;
+}
+
+.title {
+    font-size: 21px !important;
+    color: var(--bone);
+}
+
+.title-settings {
+    font-size: 28px !important;
+    color: var(--brass-light);
+}
+
+/* ---------- barre de fenêtre ---------- */
+.dragbar {
+    background: linear-gradient(180deg, rgba(10, 8, 5, 0.92), rgba(27, 19, 12, 0.82)) !important;
+    border-bottom: 1px solid rgba(198, 161, 91, 0.3);
+}
+
+.icon-minimize:hover,
+.icon-restore-down:hover,
+.icon-maximize:hover {
+    background-color: rgba(198, 161, 91, 0.25);
+}
+
+.icon-close:hover {
+    background: var(--blood);
+}
+
+/* ---------- préchargement ---------- */
+.preload-progress::before,
+.loading-spinner::before {
+    background: conic-gradient(from 0deg, transparent 0%, var(--brass-dark) 25%, var(--brass-light) 32%, transparent 60%);
+}
+
+.preload-progress::after,
+.loading-spinner::after {
+    background: rgba(21, 36, 27, 0.85);
+    border-color: rgba(198, 161, 91, 0.3);
+}
+
+.dot,
+.loading-dot {
+    background: var(--brass-light);
+    box-shadow: 0 0 18px rgba(232, 207, 148, 0.55);
+}
+
+.preload-title {
+    color: var(--bone);
+    font-size: 26px;
+}
+
+#account-loading-overlay {
+    background: var(--wool-dark);
+}
+
+/* ---------- logo ---------- */
+.brand-logo {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    padding: 2px 10px 0 0;
+}
+
+.brand-logo img {
+    width: 100%;
+    max-height: 124px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.65));
+    pointer-events: none;
+}
+
+.player-head {
+    width: 52px;
+    height: 52px;
+    border: 3px solid var(--brass);
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px #0e0905, 0 4px 10px rgba(0, 0, 0, 0.6);
+    background-color: #0e0905;
+}
+
+.player-head:hover {
+    border-color: var(--brass-light);
+    transform: none;
+    box-shadow: 0 0 0 2px #0e0905, 0 0 14px rgba(232, 207, 148, 0.5);
+}
+
+.player-tooltip {
+    left: 92px;
+    background: var(--leather-tex) var(--leather);
+    border: 2px solid var(--brass-dark);
+    border-radius: 4px;
+}
+
+.player-tooltip::before {
+    border-right-color: var(--brass-dark);
+}
+
+.player-monnaie {
+    color: var(--brass-light);
+    text-shadow: none;
+    font-weight: 700;
+}
+
+.player-tooltip-role {
+    color: var(--bone);
+    border-bottom-color: var(--stitch);
+}
+
+/* Bouton Jouer = boucle de harnais en laiton */
+.play-btn {
+    width: 58px;
+    height: 58px;
+    border: 3px solid #0e0905;
+    border-radius: 5px;
+    background: linear-gradient(145deg, #f0d89a 0%, var(--brass) 38%, var(--brass-dark) 62%, #d9bb74 100%);
+    box-shadow: 0 5px 0 #4d3a17, 0 8px 16px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* cadre intérieur de la boucle (remplace l'anneau de survol) */
+.play-btn::after {
+    inset: 6px;
+    border: 2px solid rgba(60, 42, 16, 0.75);
+    border-radius: 3px;
+    opacity: 1;
+}
+
+.play-btn::before {
+    border-color: transparent transparent transparent #2b1d0c;
+    border-width: 11px 0 11px 18px;
+    margin-left: 5px;
+    z-index: 1;
+}
+
+.play-btn:hover {
+    transform: translateY(-2px);
+    border-color: #0e0905;
+    box-shadow: 0 7px 0 #4d3a17, 0 12px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.play-btn:hover::after {
+    opacity: 1;
+    inset: 6px;
+}
+
+.play-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 1px 0 #4d3a17, 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+.text-download {
+    color: var(--bone);
+}
+
+.progress-bar::-webkit-progress-bar {
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+.progress-bar::-webkit-progress-value {
+    background: linear-gradient(90deg, var(--brass-dark), var(--brass-light));
+}
+
+.settings-btn {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--brass-dark);
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #4a3624, #1b130c);
+    color: var(--brass-light);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 235, 200, 0.15);
+}
+
+.settings-btn:hover {
+    background: radial-gradient(circle at 35% 30%, #5d4630, #231910);
+    color: #fff4d0;
+}
+
+/* ---------- ordres de mission (actualités) ---------- */
+.news-block {
+    opacity: 1;
+}
+
+.news-block:hover {
+    transform: translateY(-2px);
+    outline-color: var(--brass-light);
+}
+
+.news-header {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.05));
+    border-bottom: 1px solid rgba(198, 161, 91, 0.25);
+    border-radius: 4px 4px 0 0;
+}
+
+.news-image {
+    border: 2px solid #0e0905;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px var(--brass-dark), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.date,
+.day {
+    color: var(--brass-light);
+}
+
+.day {
+    font-family: 'Grenze', serif;
+    font-size: 24px;
+}
+
+.news-list::-webkit-scrollbar-thumb,
+.center-align::-webkit-scrollbar-thumb,
+.settings-content-scroll::-webkit-scrollbar-thumb {
+    background: var(--brass-dark);
+    border-radius: 2px;
+}
+
+.server-text .name {
+    font-size: 21px;
+}
+
+.server-text .desc {
+    color: var(--text-secondary);
+}
+
+.ytb-btn {
+    color: #2b1d0c;
+    background: linear-gradient(145deg, #f0d89a, var(--brass) 55%, var(--brass-dark));
+    border: 2px solid #0e0905;
+    border-radius: 4px;
+    box-shadow: 0 3px 0 #4d3a17;
+    font-weight: 700;
+}
+
+.ytb-btn:hover {
+    filter: none;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 0 #4d3a17;
+}
+
+.ytb-play-btn {
+    background: rgba(14, 9, 5, 0.85);
+    border: 2px solid var(--brass);
+}
+
+.ytb-play-btn:hover {
+    background: var(--brass-dark);
+}
+
+.advert-banner {
+    background: linear-gradient(180deg, #a52626, var(--blood)) !important;
+    border: 1px solid #0e0905;
+    outline: 1px dashed rgba(236, 228, 208, 0.45);
+    outline-offset: -4px;
+    color: var(--bone);
+}
+
+/* ---------- connexion : Microsoft uniquement ----------
+   Le formulaire e-mail / mot de passe reste dans le DOM (masqué) pour ne pas casser le code. */
+.login-card-main .login-input-group,
+.login-card-main .login-links,
+.login-card-main .login-btn,
+.login-card-main .login-separator,
+.login-card-main .login-header .login-icon {
+    display: none !important;
+}
+
+.login-card-main,
+.a2f-card,
+.email-verify-card {
+    border-radius: 6px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.login-card-main {
+    width: 440px;
+    padding: 36px 44px 26px 44px;
+    animation: none;
+}
+
+.login-logo {
+    display: block;
+    width: 70%;
+    max-width: 250px;
+    margin: -2px auto 12px;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.7));
+    pointer-events: none;
+}
+
+.login-card-main .login-header {
+    margin-bottom: 8px;
+}
+
+.login-title {
+    color: var(--brass-light);
+    font-size: 30px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.login-card-main .login-form {
+    gap: 0;
+}
+
+.info-login,
+.info-login-2f,
+.info-login-email {
+    display: block;
+    color: #f0b9a8;
+    text-shadow: none;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.login-card-main .info-login {
+    min-height: 20px;
+    margin: 0 0 14px;
+}
+
+/* Tampon de la Légion : bouton Microsoft sur papier crème, relief physique */
+.microsoft-btn {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin: 4px 0 8px;
+    padding: 0 16px;
+    background: linear-gradient(180deg, #f4ecd8, #ddd0b0);
+    color: #2b1d0c;
+    border: 2px solid #0e0905;
+    border-radius: 4px;
+    font: 700 18px/1 'Poppins', sans-serif;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+    box-shadow: 0 4px 0 #6f5a2b, 0 8px 14px rgba(0, 0, 0, 0.5);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.microsoft-btn img {
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+}
+
+.microsoft-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #6f5a2b, 0 12px 16px rgba(0, 0, 0, 0.5);
+}
+
+.microsoft-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #6f5a2b, 0 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.microsoft-btn:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+}
+
+.cancel {
+    color: var(--bone);
+}
+
+/* ---------- paramètres ---------- */
+.tabs-settings-btn {
+    width: 176px;
+    border-right: 2px solid #0e0905;
+    box-shadow: 6px 0 18px rgba(0, 0, 0, 0.55);
+}
+
+.settings-logo {
+    width: 100%;
+    max-height: 92px;
+    object-fit: contain;
+    margin: -22px 0 6px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
+    pointer-events: none;
+}
+
+.tabs-settings-btn .tab-btn-css:first-of-type {
+    margin-top: 14px !important;
+}
+
+.tab-btn-css {
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid #0e0905;
+    border-radius: 3px;
+    color: var(--bone);
+    font-size: 16px;
+    outline: 1px dashed rgba(198, 161, 91, 0.3);
+    outline-offset: -4px;
+}
+
+.tab-btn-css:hover {
+    background: rgba(198, 161, 91, 0.16);
+    color: #fff4d0;
+    transform: none;
+    outline-color: var(--brass);
+}
+
+.active-tab-btn {
+    background: linear-gradient(145deg, #f0d89a, var(--brass) 55%, var(--brass-dark));
+    color: #2b1d0c !important;
+    font-weight: 700;
+    border-color: #0e0905;
+    box-shadow: 0 3px 0 #4d3a17;
+    outline-color: rgba(60, 42, 16, 0.6);
+}
+
+.active-tab-btn:hover {
+    background: linear-gradient(145deg, #f6e2a8, #d3ae66 55%, #967438);
+    color: #2b1d0c !important;
+}
+
+.active-account {
+    border-color: var(--brass) !important;
+    box-shadow: 0 0 0 2px var(--brass-dark), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.path,
+.args-settings,
+.input-settings,
+.input-size,
+.select {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid #0e0905;
+    border-radius: 3px;
+    color: var(--bone);
+}
+
+.slider-line span {
+    background: linear-gradient(90deg, var(--brass-dark), var(--brass-light));
+}
+
+.slider-touch-left span,
+.slider-touch-right span {
+    border-color: var(--brass-light);
+}
+
+.information,
+.ram-info-block {
+    color: var(--text-secondary);
+}

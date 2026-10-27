@@ -550,7 +550,12 @@ class Settings {
 
         const skin = document.querySelector('.skin-renderer-settings');
         const cacheBuster = new Date().getTime();
-        const url = `${azauth}skin3d/3d-api/skin-api/${account.name}`;
+        const url = `${azauth}skin3d/3d-api/skin-api/${encodeURIComponent(account.name)}?t=${cacheBuster}`;
+        // Keep the renderer centered in its preview frame and force a fresh
+        // render when switching accounts or updating the skin.
+        skin.style.display = 'block';
+        skin.style.margin = '0 auto';
+        skin.style.maxWidth = '100%';
         skin.src = url;
     }
 
@@ -644,10 +649,18 @@ class Settings {
         }
 
         document.querySelector('.save-tabs-btn').addEventListener('click', async () => {
-            document.querySelector('.default-tab-btn').click();
-            showLoadingOverlay();
-            changePanel("home");
-            await this.refreshData();
+            // Settings are persisted by their individual controls. Do not call
+            // refreshData() here: that method targets the home panel's DOM and
+            // can throw after switching panels, leaving the loading overlay open.
+            try {
+                const defaultTab = document.querySelector('.default-tab-btn');
+                if (defaultTab) defaultTab.click();
+                await changePanel("home");
+            } catch (error) {
+                console.error('Unable to return to the home panel after saving settings:', error);
+            } finally {
+                hideLoadingOverlay();
+            }
         });
 
         document.getElementById('accounts-tab').innerHTML = `<i class="fas fa-user"></i><span>${t('accounts')}</span>`;

@@ -20,6 +20,7 @@ class Login {
         this.config = config;
         this.database = await new database().init();
         this.setStaticTexts();
+        this.setupMicrosoftButton();
         this.config.online ? this.getOnline() : this.getOffline();
     }
 
@@ -36,6 +37,8 @@ class Login {
         document.getElementById('login-btn').textContent = t('play');
         document.getElementById('password-reset-link').textContent = t('forgot_password');
         document.getElementById('new-user-link').textContent = t('no_account');
+        document.getElementById('login-or-label').textContent = t('login_or');
+        document.getElementById('microsoft-btn-label').textContent = t('microsoft_login');
     }
 
     async refreshData() {
@@ -307,6 +310,75 @@ class Login {
             elements.infoLogin.innerHTML = t('connection_error');
             this.enableLoginForm(elements);
         }
+    }
+
+    setupMicrosoftButton() {
+        document.getElementById('microsoft-btn').addEventListener('click', () => this.handleMicrosoftLogin(this.getElements()));
+    }
+
+    getMicrosoftErrorMessage(ms) {
+        const detail = [ms.errorType, ms.XErr].filter(Boolean).join(' ');
+        if (ms.errorType === 'game') return t('microsoft_no_game');
+        if (ms.errorType === 'xsts' && ms.XErr === 2148916233) return t('microsoft_no_xbox');
+        if (ms.errorType === 'xsts' && ms.XErr === 2148916238) return t('microsoft_child');
+        if (ms.errorType === 'xsts' && ms.XErr === 2148916235) return t('microsoft_country');
+        return `${t('microsoft_error')}${detail ? ` (${detail})` : ''}`;
+    }
+
+    async handleMicrosoftLogin(elements) {
+        const microsoftBtn = document.getElementById('microsoft-btn');
+        microsoftBtn.disabled = true;
+        elements.infoLogin.innerHTML = t('connecting');
+
+        try {
+            // La fenêtre OAuth Microsoft est ouverte par le processus principal (app.js)
+            const ms = await ipcRenderer.invoke('Microsoft-window', pkg.microsoft_client_id || '');
+
+            if (!ms) {
+                elements.infoLogin.innerHTML = t('microsoft_cancelled');
+                return;
+            }
+
+            if (ms.error) {
+                console.error(ms);
+                elements.infoLogin.innerHTML = this.getMicrosoftErrorMessage(ms);
+                return;
+            }
+
+            const account = this.createMicrosoftAccountObject(ms);
+            await this.saveAccount(account);
+            this.resetLoginForm(elements);
+            elements.infoLogin.innerHTML = "&nbsp;";
+        } catch (err) {
+            console.error(err);
+            elements.infoLogin.innerHTML = t('microsoft_error');
+        } finally {
+            microsoftBtn.disabled = false;
+        }
+    }
+
+    createMicrosoftAccountObject(ms) {
+        return {
+            access_token: ms.access_token,
+            client_token: ms.client_token || ms.uuid,
+            uuid: ms.uuid,
+            name: ms.name,
+            refresh_token: ms.refresh_token,
+            user_properties: ms.user_properties,
+            meta: {
+                type: ms.meta.type,
+                access_token_expires_in: ms.meta.access_token_expires_in,
+                demo: ms.meta.demo,
+                offline: false
+            },
+            xboxAccount: ms.xboxAccount,
+            profile: {},
+            user_info: {
+                role: { name: 'Microsoft' },
+                monnaie: 0,
+                verified: true,
+            },
+        };
     }
 
     createAccountObject(account_connect) {

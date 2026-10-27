@@ -6,7 +6,7 @@
  * Edited by CentralCorp Team
  */
 const { app, ipcMain, nativeTheme } = require('electron');
-const { Microsoft } = require('minecraft-java-core-azbetter');
+const Microsoft = require('./assets/js/utils/microsoftAuth.js');
 const { autoUpdater } = require('electron-updater')
 
 const path = require('path');

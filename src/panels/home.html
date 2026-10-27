@@ -1,36 +1,21 @@
 <style class="bodyimg"></style>
 <div class="home-content">
-    <aside class="sidebar">
-        <div class="sidebar-top">
-            <div class="player-avatar-wrapper">
-                <div class="player-head"></div>
-                <div class="player-tooltip">
-                    <div class="player-tooltip-role"></div>
-                    <div class="player-monnaie"></div>
-                </div>
-            </div>
-            <div class="player-role"></div>
-        </div>
-        <div class="sidebar-middle">
-            <div class="play-element">
-                <button class="play-btn" id="play-btn"></button>
-                <div class="download-content">
-                    <div class="text-download" id="text-download"></div>
-                    <progress value="0" max="0" class="progress-bar"></progress>
+    <header class="top-belt">
+        <div class="belt-left">
+            <div class="sidebar-top">
+                <div class="player-avatar-wrapper">
+                    <div class="player-head"></div>
                 </div>
             </div>
         </div>
-        <div class="sidebar-bottom">
-            <button class="settings-btn icon-settings" id="settings-btn"></button>
+
+        <div class="belt-center">
+            <div class="brand-logo">
+                <img src="assets/images/logo.png" alt="SNK : Last Dawn" draggable="false" />
+            </div>
         </div>
-    </aside>
 
-    <main class="main-content">
-        <section class="news-section">
-            <div class="news-list"></div>
-        </section>
-
-        <aside class="info-section">
+        <div class="belt-right">
             <div class="info-item">
                 <div class="server">
                     <img class="server-img" />
@@ -44,6 +29,18 @@
                     </div>
                 </div>
             </div>
+            <div class="sidebar-bottom">
+                <button class="settings-btn icon-settings" id="settings-btn"></button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="news-section">
+            <div class="news-list"></div>
+        </section>
+
+        <aside class="info-section">
             <div class="info-item ytb-container">
                 <div class="ytb">
                     <div class="ytb-header">
@@ -65,4 +62,16 @@
 
         <div class="advert-banner" id="advert-banner" style="display:none;"></div>
     </main>
+
+    <footer class="bottom-belt">
+        <div class="sidebar-middle">
+            <div class="play-element">
+                <button class="play-btn" id="play-btn"></button>
+                <div class="download-content">
+                    <div class="text-download" id="text-download"></div>
+                    <progress value="0" max="0" class="progress-bar"></progress>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>

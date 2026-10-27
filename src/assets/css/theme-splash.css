@@ -1,0 +1,36 @@
+/* Écran de démarrage — cape de la Légion */
+body {
+    background:
+        radial-gradient(ellipse at 50% 38%, rgba(0, 0, 0, 0) 0%, rgba(8, 14, 10, 0.75) 100%),
+        url("../images/background/light.jpg") #15241b center / cover no-repeat !important;
+}
+
+.splash {
+    width: 240px;
+    height: auto;
+    top: 150px;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.7));
+}
+
+.splash.translate {
+    top: 105px;
+}
+
+.splash-message,
+.message {
+    font-family: 'Grenze', Georgia, serif;
+    color: #ece4d0;
+}
+
+.splash-author {
+    color: rgba(236, 228, 208, 0.7);
+}
+
+progress::-webkit-progress-bar {
+    background-color: rgba(0, 0, 0, 0.55);
+    border: 1px solid #0e0905;
+}
+
+progress::-webkit-progress-value {
+    background: linear-gradient(90deg, #8a6a2f, #e8cf94);
+}

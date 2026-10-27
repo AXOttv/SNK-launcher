@@ -7,7 +7,8 @@
  */
 'use strict';
 const fs = require('fs');
-const { Microsoft, Mojang, AZauth } = require('minecraft-java-core-azbetter');
+const { Mojang, AZauth } = require('minecraft-java-core-azbetter');
+const Microsoft = require('./assets/js/utils/microsoftAuth.js');
 const pkg = require('../package.json');
 const { ipcRenderer } = require('electron');
 const DiscordRPC = require('discord-rpc');
@@ -149,6 +150,38 @@ class Launcher {
                     this.database.update(refreshAccounts, 'accounts');
                     addAccount(refreshAccounts);
                     if (account.uuid === selectedAccount) accountSelect(refresh.uuid);
+                } else if (account.meta.type === 'Xbox') {
+                    console.log(`Initializing Microsoft account ${account.name}...`);
+                    const refresh = await new Microsoft(pkg.microsoft_client_id || '').refresh(account);
+
+                    if (refresh.error) {
+                        this.database.delete(account.uuid, 'accounts');
+                        if (account.uuid === selectedAccount) this.database.update({ uuid: "1234" }, 'accounts-selected');
+                        console.error(`[Account] ${account.uuid}: ${refresh.error}`);
+                        continue;
+                    }
+
+                    const refreshAccounts = {
+                        access_token: refresh.access_token,
+                        client_token: refresh.client_token || refresh.uuid,
+                        uuid: refresh.uuid,
+                        name: refresh.name,
+                        refresh_token: refresh.refresh_token,
+                        user_properties: refresh.user_properties,
+                        meta: {
+                            type: refresh.meta.type,
+                            access_token_expires_in: refresh.meta.access_token_expires_in,
+                            demo: refresh.meta.demo,
+                            offline: false
+                        },
+                        xboxAccount: refresh.xboxAccount,
+                        profile: refresh.profile || account.profile || {},
+                        user_info: account.user_info || { role: { name: 'Microsoft' }, monnaie: 0, verified: true },
+                    };
+
+                    this.database.update(refreshAccounts, 'accounts');
+                    addAccount(refreshAccounts);
+                    if (account.uuid === selectedAccount) accountSelect(refresh.uuid);
                 } else {
                     this.database.delete(account.uuid, 'accounts');
                     if (account.uuid === selectedAccount) this.database.update({ uuid: "1234" }, 'accounts-selected');
@@ -183,9 +216,6 @@ class Launcher {
     }
 
     async refreshDataAndPreload() {
-        document.querySelector('.player-role').innerHTML = '';
-        document.querySelector('.player-monnaie').innerHTML = '';
-        document.querySelector('.player-tooltip-role').innerHTML = '';
 
         const loadPromises = [];
         loadPromises.push(this.initPreviewSkin());
@@ -193,8 +223,7 @@ class Launcher {
         const uuid = (await this.database.get('1234', 'accounts-selected')).value;
         const account = (await this.database.get(uuid.selected, 'accounts')).value;
 
-        this.updateRole(account);
-        this.updateMoney(account);
+        this.updatePlayerHead(account);
         this.updateWhitelist(account);
 
         loadPromises.push(this.preloadBackground(account));
@@ -211,56 +240,62 @@ class Launcher {
     }
 
     async refreshData() {
-        document.querySelector('.player-role').innerHTML = '';
-        document.querySelector('.player-monnaie').innerHTML = '';
-        document.querySelector('.player-tooltip-role').innerHTML = '';
         await this.initPreviewSkin();
         await this.initOthers();
     }
 
     async initPreviewSkin() {
         console.log('initPreviewSkin called');
-        const baseUrl = settings_url.endsWith('/') ? settings_url : `${settings_url}/`;
-        const azauth = this.getAzAuthUrl();
-        const uuid = (await this.database.get('1234', 'accounts-selected')).value;
-        const account = (await this.database.get(uuid.selected, 'accounts')).value;
+        const selected = (await this.database.get('1234', 'accounts-selected'))?.value;
+        const account = selected?.selected
+            ? (await this.database.get(selected.selected, 'accounts'))?.value
+            : null;
+        if (!account) return;
 
-        document.querySelector('.player-skin-title').innerHTML = `Skin de ${account.name}`;
-        document.querySelector('.skin-renderer-settings').src = `${azauth}skin3d/3d-api/skin-api/${account.name}`;
+        const skinTitle = document.querySelector('.player-skin-title');
+        const skinRenderer = document.querySelector('.skin-renderer-settings');
+        const uuid = String(account.uuid || '').replace(/-/g, '').toLowerCase();
+        if (skinTitle) skinTitle.textContent = `Skin de ${account.name || 'joueur'}`;
+        // Visage resolves the official Java skin from the player's UUID, not a local/site username.
+        if (skinRenderer && /^[0-9a-f]{32}$/.test(uuid)) {
+            skinRenderer.src = `https://visage.surgeplay.com/full/180/${uuid}?v=${Date.now()}`;
+        }
+        this.updatePlayerHead(account);
     }
 
     async initOthers() {
         const uuid = (await this.database.get('1234', 'accounts-selected')).value;
         const account = (await this.database.get(uuid.selected, 'accounts')).value;
 
-        this.updateRole(account);
-        this.updateMoney(account);
+        this.updatePlayerHead(account);
         this.updateWhitelist(account);
         this.updateBackground(account);
     }
 
-    updateRole(account) {
-        const tooltipRole = document.querySelector('.player-tooltip-role');
-        const sidebarRole = document.querySelector('.player-role');
+    updatePlayerHead(account) {
+        const head = document.querySelector('.player-head');
+        if (!head) return;
 
-        if (this.config.role && account.user_info.role) {
-            const roleName = account.user_info.role.name;
-            tooltipRole.textContent = roleName;
-            sidebarRole.textContent = roleName;
-        } else {
-            tooltipRole.style.display = 'none';
-            sidebarRole.style.display = 'none';
+        // Microsoft/Minecraft authentication returns the official Java profile UUID.
+        // Crafatar renders the head from the skin attached to that UUID.
+        const uuid = String(account?.uuid || account?.id || '').replace(/-/g, '');
+        if (!/^[0-9a-f]{32}$/i.test(uuid)) {
+            head.style.backgroundImage = '';
+            head.style.backgroundColor = 'rgba(255,255,255,0.08)';
+            return;
         }
+
+        const avatarUrl = `https://visage.surgeplay.com/face/64/${uuid}?v=${Date.now()}`;
+        head.style.backgroundImage = `url("${avatarUrl}")`;
+        head.style.backgroundSize = 'cover';
+        head.style.backgroundPosition = 'center';
+        head.style.backgroundRepeat = 'no-repeat';
+        head.setAttribute('aria-label', `Tête Minecraft de ${account.name || 'joueur'}`);
     }
 
-    updateMoney(account) {
-        const monnaieEl = document.querySelector('.player-monnaie');
-        if (this.config.money) {
-            monnaieEl.textContent = `${account.user_info.monnaie} pts`;
-        } else {
-            monnaieEl.style.display = 'none';
-        }
-    }
+    // Role and credits are intentionally not displayed in this launcher.
+    updateRole() {}
+    updateMoney() {}
 
     applyAccentColor() {
         if (this.config.accent_color) {
@@ -292,7 +327,7 @@ class Launcher {
         const playBtn = document.querySelector(".play-btn");
         if (this.config.whitelist_activate &&
             (!this.config.whitelist.includes(account.name) &&
-                !this.config.whitelist_roles.includes(account.user_info.role.name))) {
+                !this.config.whitelist_roles.includes(account.user_info?.role?.name))) {
             playBtn.style.background = "#696969";
             playBtn.style.pointerEvents = "none";
             playBtn.style.boxShadow = "none";
